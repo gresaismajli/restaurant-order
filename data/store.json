@@ -1,0 +1,79 @@
+{
+  "waiters": [
+    {
+      "id": "w1",
+      "name": "Arta"
+    },
+    {
+      "id": "w2",
+      "name": "Jon"
+    },
+    {
+      "id": "w3",
+      "name": "Mira"
+    }
+  ],
+  "products": [
+    {
+      "id": "p1",
+      "name": "Margherita Pizza",
+      "category": "Pizza",
+      "price": 7.5
+    },
+    {
+      "id": "p2",
+      "name": "Prosciutto Pizza",
+      "category": "Pizza",
+      "price": 9.2
+    },
+    {
+      "id": "p3",
+      "name": "Chicken Caesar Salad",
+      "category": "Salads",
+      "price": 6.8
+    },
+    {
+      "id": "p4",
+      "name": "Beef Burger",
+      "category": "Grill",
+      "price": 8.4
+    },
+    {
+      "id": "p5",
+      "name": "Grilled Salmon",
+      "category": "Main",
+      "price": 13.5
+    },
+    {
+      "id": "p6",
+      "name": "Penne Arrabbiata",
+      "category": "Pasta",
+      "price": 7.9
+    },
+    {
+      "id": "p7",
+      "name": "Tiramisu",
+      "category": "Dessert",
+      "price": 4.2
+    },
+    {
+      "id": "p8",
+      "name": "Sparkling Water",
+      "category": "Drinks",
+      "price": 1.8
+    },
+    {
+      "id": "p9",
+      "name": "House Lemonade",
+      "category": "Drinks",
+      "price": 2.6
+    },
+    {
+      "id": "p10",
+      "name": "Espresso",
+      "category": "Drinks",
+      "price": 1.4
+    }
+  ],
+  "orders": []
+}

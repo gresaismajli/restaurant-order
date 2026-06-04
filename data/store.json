@@ -235,6 +235,14 @@
   "cashClosures": [],
   "audit": [
     {
+      "id": "a_1780439042334_a1a94065",
+      "action": "login",
+      "userId": "u_admin",
+      "userName": "Manager",
+      "details": {},
+      "at": "2026-06-02T22:24:02.334Z"
+    },
+    {
       "id": "a_1780438968525_3ce62543",
       "action": "login",
       "userId": "u_admin",

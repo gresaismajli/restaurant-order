@@ -2,6 +2,7 @@
 node_modules/
 
 # Runtime restaurant data
+data/store.json
 data/backups/
 data/*.tmp
 data/test-*.json

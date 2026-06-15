@@ -1,10 +1,20 @@
 # Restaurant Orders
 
-A production-oriented local restaurant ordering app with waiter order-taking, kitchen status control, payment closing, daily cash reporting, role-based login, menu administration, and audit history.
+A restaurant ordering app with waiter order-taking, kitchen status control, payment closing, daily reporting, role-based login, menu administration, staff management, and audit history.
 
-## Run locally
+The app now stores data in Postgres, not JSON files. The backend is split so it can run locally with `server.js` and on Vercel through `api/index.js`.
+
+## Requirements
+
+- Node.js 18+
+- A Postgres database
+- `DATABASE_URL` environment variable
+
+## Run Locally
 
 ```bash
+npm install
+set DATABASE_URL=postgres://user:password@host:5432/database
 npm start
 ```
 
@@ -14,9 +24,40 @@ Open:
 http://localhost:3000
 ```
 
-## Default users
+On PowerShell you can set the variable with:
 
-Change these before real use.
+```powershell
+$env:DATABASE_URL="postgres://user:password@host:5432/database"
+npm start
+```
+
+## Vercel Deploy
+
+1. Push this repo to GitHub.
+2. Import it in Vercel.
+3. Add a Postgres database, for example Vercel Postgres, Neon, Supabase, or Railway.
+4. Set `DATABASE_URL` in Vercel project environment variables.
+5. Deploy.
+
+The first request will create the database tables and seed the default users/products.
+
+## Migrate Existing JSON Data
+
+If you already have data in `data/store.json`, set `DATABASE_URL` and run:
+
+```bash
+npm run migrate:json
+```
+
+You can also pass a custom JSON file:
+
+```bash
+node scripts/migrate-json-to-postgres.js ./data/store.json
+```
+
+## Default Users
+
+Change these immediately before real use.
 
 | Role | Username | Password |
 | --- | --- | --- |
@@ -25,47 +66,22 @@ Change these before real use.
 | Waiter | `arta` | `waiter123` |
 | Waiter | `jon` | `waiter123` |
 
-## Main workflows
+## Main Workflows
 
-- Waiter logs in, creates a table order, adds menu items and kitchen notes, then sends it to the kitchen.
-- Kitchen logs in, confirms the order, moves it to preparing, then marks it done.
-- Waiter sees the status update, accepts payment, applies discount/tip/payment method, and closes the order as paid.
-- Admin views daily sales, payment-method totals, waiter totals, voids, tips, discounts, and can close the day.
-- Admin can add/edit menu items, update prices, and hide unavailable products.
-- Every important action is recorded in the audit log.
+- Waiter creates a table order and sends it to the kitchen.
+- Kitchen confirms, prepares, and marks orders done.
+- Waiter closes done orders as paid with payment method, discount, and tip.
+- Admin views daily reports, voids, payment-method totals, and waiter totals.
+- Admin manages products in the Menu tab.
+- Admin creates, edits, activates, and removes waiters in the Staff tab.
+- Important actions are stored in the audit log.
 
-## Data and backups
-
-Data is stored in:
-
-```text
-data/store.json
-```
-
-The server writes the file atomically and creates periodic backups in:
-
-```text
-data/backups/
-```
-
-For real deployment, back up this directory automatically and test restore procedures.
-
-## Production notes
-
-This app is much stronger than the first prototype, but a real restaurant deployment still needs the right environment:
-
-- Run behind HTTPS with a real domain or private restaurant network.
-- Replace default passwords immediately.
-- Use a process manager such as PM2, Windows Service, Docker, or a managed host so the server restarts after crashes/reboots.
-- Use a managed database if multiple branches, heavy traffic, long-term reporting, or compliance requirements matter.
-- Put automatic backups on a separate machine/cloud location.
-- Test with the restaurant staff before opening service.
-
-## Environment variables
+## Environment Variables
 
 ```bash
+DATABASE_URL=postgres://user:password@host:5432/database
+PGSSL=true
 PORT=3000
-DATA_FILE=./data/store.json
 ```
 
-`DATA_FILE` is useful for staging or testing without touching production data.
+Set `PGSSL=false` only for local Postgres instances that do not use SSL.

@@ -34,7 +34,7 @@ const state = {
 	closeDay: { countedCash: "", note: "" },
 	toast: "",
 	orderSnapshot: {},
-	audioReady: false,
+	audioReady: localStorage.getItem("restaurant_alerts_enabled") === "true",
 	audioContext: null,
 };
 
@@ -82,27 +82,64 @@ function ensureAudio() {
 	if (!state.audioContext) state.audioContext = new AudioContext();
 	if (state.audioContext.state === "suspended") state.audioContext.resume();
 	state.audioReady = true;
+	localStorage.setItem("restaurant_alerts_enabled", "true");
 	return state.audioContext;
 }
 
 function playTone(kind) {
 	const audio = ensureAudio();
 	if (!audio || audio.state === "suspended") return;
-	const tones = kind === "ready" ? [740, 980, 1220] : [520, 660];
+	const tones = kind === "ready"
+		? [392, 523, 659, 784, 1046, 784]
+		: [330, 440, 554, 740, 554];
 	tones.forEach((frequency, index) => {
 		const oscillator = audio.createOscillator();
 		const gain = audio.createGain();
-		const start = audio.currentTime + index * 0.13;
-		oscillator.type = "sine";
+		const start = audio.currentTime + index * 0.18;
+		oscillator.type = "square";
 		oscillator.frequency.value = frequency;
 		gain.gain.setValueAtTime(0.0001, start);
-		gain.gain.exponentialRampToValueAtTime(0.18, start + 0.015);
-		gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.11);
+		gain.gain.exponentialRampToValueAtTime(0.34, start + 0.02);
+		gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.16);
 		oscillator.connect(gain);
 		gain.connect(audio.destination);
 		oscillator.start(start);
-		oscillator.stop(start + 0.12);
+		oscillator.stop(start + 0.18);
 	});
+}
+
+function vibrate(kind) {
+	if (!navigator.vibrate) return;
+	if (kind === "ready") navigator.vibrate([400, 120, 400, 120, 700]);
+	else navigator.vibrate([300, 100, 300, 100, 300]);
+}
+
+async function enableAlerts() {
+	ensureAudio();
+	if ("Notification" in window && Notification.permission === "default") {
+		try {
+			await Notification.requestPermission();
+		} catch (error) {}
+	}
+	state.audioReady = true;
+	localStorage.setItem("restaurant_alerts_enabled", "true");
+	render();
+}
+
+function notify(title, body, kind) {
+	playTone(kind);
+	vibrate(kind);
+	if ("Notification" in window && Notification.permission === "granted") {
+		try {
+			new Notification(title, {
+				body,
+				tag: `restaurant-${kind}`,
+				renotify: true,
+				requireInteraction: kind === "ready",
+				vibrate: kind === "ready" ? [400, 120, 400, 120, 700] : [300, 100, 300]
+			});
+		} catch (error) {}
+	}
 }
 
 function stationForCurrentView() {
@@ -152,11 +189,11 @@ function detectOrderNotifications(nextOrders) {
 	});
 
 	if (newStationOrder) {
-		playTone("new");
+		notify("New order received", "A new order arrived for this station.", "new");
 		toast("New order received");
 	}
 	if (waiterReadyOrder) {
-		playTone("ready");
+		notify("Order ready for pickup", "An order is fully done.", "ready");
 		toast("Order ready for pickup");
 	}
 	primeOrderSnapshot(nextOrders);
@@ -230,7 +267,7 @@ async function login() {
 		});
 		state.token = data.token;
 		localStorage.setItem("restaurant_token", state.token);
-		ensureAudio();
+		if (state.audioReady) ensureAudio();
 		state.me = data.user;
 		state.view = defaultViewForRole(data.user.role);
 		await bootstrap();
@@ -831,7 +868,7 @@ function renderShell() {
 					)
 					.join(
 						"",
-					)}<button class="tab" data-action="enable-sound">${state.audioReady ? "Sound on" : "Sound"}</button><button class="tab" data-action="logout">Logout</button></nav>
+					)}<button class="tab" data-action="enable-sound">${state.audioReady ? "Alerts on" : "Enable alerts"}</button><button class="tab" data-action="logout">Logout</button></nav>
       </header>
       <main class="main">${body}</main>
       ${state.toast ? `<div class="toast">${escapeHtml(state.toast)}</div>` : ""}
@@ -855,9 +892,10 @@ app.addEventListener("click", async (event) => {
 	}
 	const action = target.dataset.action;
 	if (action === "enable-sound") {
-		ensureAudio();
-		playTone("new");
-		toast("Sound enabled");
+		await enableAlerts();
+		playTone("ready");
+		vibrate("ready");
+		toast("Alerts enabled");
 		return;
 	}
 	if (action === "login") login();

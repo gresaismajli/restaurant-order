@@ -520,6 +520,15 @@ button:disabled {
   gap: 14px;
 }
 
+.station-board {
+  display: grid;
+  gap: 14px;
+}
+
+.station-hero {
+  box-shadow: none;
+}
+
 .column {
   min-height: 420px;
   padding: 12px;

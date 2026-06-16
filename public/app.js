@@ -99,6 +99,13 @@ function allowedViews() {
 	return ["waiter"];
 }
 
+function defaultViewForRole(role) {
+	if (role === "kitchen") return "kitchen";
+	if (role === "bartender") return "bar";
+	if (role === "pizzaman") return "pizza";
+	return "waiter";
+}
+
 async function bootstrap() {
 	if (!state.token) {
 		render();
@@ -111,6 +118,9 @@ async function bootstrap() {
 		state.users = data.users || [];
 		state.products = data.products;
 		state.orders = data.orders;
+		if (["kitchen", "bartender", "pizzaman"].indexOf(state.me.role) > -1) {
+			state.view = defaultViewForRole(state.me.role);
+		}
 		if (allowedViews().indexOf(state.view) === -1)
 			state.view = allowedViews()[0];
 		if (state.view === "reports") await loadReport();
@@ -131,7 +141,7 @@ async function login() {
 		state.token = data.token;
 		localStorage.setItem("restaurant_token", state.token);
 		state.me = data.user;
-		state.view = allowedViews()[0] || "waiter";
+		state.view = defaultViewForRole(data.user.role);
 		await bootstrap();
 		toast(`Logged in as ${data.user.name}`);
 	} catch (error) {
@@ -580,14 +590,14 @@ function renderStation(station) {
 		{ title: "Cooking", statuses: ["received", "preparing"] },
 		{ title: "Ready", statuses: ["done"] },
 	];
-	return `<section class="kitchen-grid">${columns
+	return `<section class="station-board"><div class="panel station-hero"><div class="panel-header"><div><h2>${stationLabels[station]} orders</h2><p>Receive and complete only the items assigned to this station.</p></div></div></div><div class="kitchen-grid">${columns
 		.map((column) => {
 			const orders = activeOrders().filter(
 				(order) => order.stationStatuses && order.stationStatuses[station] && column.statuses.indexOf(order.stationStatuses[station].status) > -1,
 			);
 			return `<div class="column"><h2>${stationLabels[station]} - ${column.title}</h2><div class="order-list">${orders.map((order) => orderCard(order, `station:${station}`)).join("") || `<p class="empty">Nothing here.</p>`}</div></div>`;
 		})
-		.join("")}</section>`;
+		.join("")}</div></section>`;
 }
 
 function renderReports() {

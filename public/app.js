@@ -943,7 +943,33 @@ function renderShell() {
 }
 
 function render() {
+	const focused = document.activeElement;
+	const focusState =
+		focused &&
+		app.contains(focused) &&
+		focused.dataset &&
+		focused.dataset.action
+			? {
+					action: focused.dataset.action,
+					id: focused.dataset.id || "",
+					start: focused.type === "number" ? null : focused.selectionStart,
+					end: focused.type === "number" ? null : focused.selectionEnd,
+				}
+			: null;
 	app.innerHTML = state.me ? renderShell() : renderLogin();
+	if (!focusState) return;
+	const selector = `[data-action="${focusState.action}"]${focusState.id ? `[data-id="${focusState.id}"]` : ""}`;
+	const next = app.querySelector(selector);
+	if (!next) return;
+	next.focus();
+	if (
+		next.type !== "number" &&
+		typeof focusState.start === "number" &&
+		typeof focusState.end === "number" &&
+		typeof next.setSelectionRange === "function"
+	) {
+		next.setSelectionRange(focusState.start, focusState.end);
+	}
 }
 
 app.addEventListener("click", async (event) => {

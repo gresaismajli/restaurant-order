@@ -512,9 +512,7 @@ async function deleteProduct(id) {
 	if (!product || !confirm(`Delete ${product.name} from the menu?`)) return;
 	try {
 		const updated = await api(`/api/products/${id}`, { method: "DELETE" });
-		state.products = state.products.map((item) =>
-			item.id === updated.id ? updated : item,
-		);
+		state.products = state.products.filter((item) => item.id !== updated.id);
 		if (state.productForm.id === id) resetProductForm();
 		await loadAudit();
 		toast(`${updated.name} removed from menu`);

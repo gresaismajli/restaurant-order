@@ -63,8 +63,8 @@ Change these immediately before real use.
 | --- | --- | --- |
 | Admin/manager | `admin` | `admin123` |
 | Kitchen | `kitchen` | `kitchen123` |
-| Waiter | `arta` | `waiter123` |
-| Waiter | `jon` | `waiter123` |
+| Bartender | `bartender` | `bar123` |
+| Pizzaman | `pizzaman` | `pizza123` |
 
 ## Main Workflows
 

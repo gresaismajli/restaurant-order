@@ -704,7 +704,7 @@ function renderLogin() {
         <div class="field"><label>Username</label><input class="input" data-action="login-username" value="${escapeHtml(state.login.username)}"></div>
         <div class="field"><label>Password</label><input class="input" type="password" data-action="login-password" value="${escapeHtml(state.login.password)}"></div>
         <button class="primary" data-action="login">Log in</button>
-        <p class="empty">Defaults: admin/admin123, kitchen/kitchen123, arta/waiter123, jon/waiter123.</p>
+        <p class="empty">Defaults: admin/admin123, kitchen/kitchen123, bartender/bar123, pizzaman/pizza123.</p>
       </section>
       ${state.toast ? `<div class="toast">${escapeHtml(state.toast)}</div>` : ""}
     </main>

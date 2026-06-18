@@ -25,7 +25,7 @@ const state = {
 	productForm: {
 		id: "",
 		name: "",
-		category: "",
+		category: "Pizza",
 		price: "",
 		available: true,
 		sort: 999,
@@ -49,6 +49,19 @@ const statusLabels = {
 };
 const statusRank = { sent: 1, received: 2, preparing: 3, done: 4 };
 const stationLabels = { bar: "Bartender", pizza: "Pizzaman", kitchen: "Kitchen" };
+const productCategories = [
+	"Pizza",
+	"Soups",
+	"Rissoto",
+	"Pasta",
+	"Grill",
+	"Mix grill",
+	"Fish",
+	"Mix fish",
+	"Salads",
+	"Side dish",
+	"Drinks and coctails",
+];
 
 function money(value) {
 	return new Intl.NumberFormat("en-US", {
@@ -350,7 +363,9 @@ async function loadAudit() {
 
 function categories() {
 	return ["all"].concat(
-		Array.from(new Set(state.products.map((product) => product.category))),
+		Array.from(
+			new Set(productCategories.concat(state.products.map((product) => product.category))),
+		).filter(Boolean),
 	);
 }
 
@@ -525,7 +540,7 @@ function resetProductForm() {
 	state.productForm = {
 		id: "",
 		name: "",
-		category: "",
+		category: "Pizza",
 		price: "",
 		available: true,
 		sort: 999,
@@ -754,7 +769,7 @@ function renderWaiter() {
         </div>
       </section>
       <aside class="panel"><div class="panel-header"><div><h2>Ticket</h2><p>${state.cart.length} item${state.cart.length === 1 ? "" : "s"}</p></div></div>
-        <div class="panel-body"><div class="cart-list">${cart || `<p class="empty">Tap products to add them.</p>`}</div><div class="cart-footer"><div class="total-row"><span>Total</span><span>${money(cartTotal())}</span></div><button class="primary" data-action="send-order" ${state.cart.length ? "" : "disabled"}>Send to kitchen</button></div></div>
+        <div class="panel-body"><div class="cart-list">${cart || `<p class="empty">Tap products to add them.</p>`}</div><div class="cart-footer"><div class="total-row"><span>Total</span><span>${money(cartTotal())}</span></div><button class="primary" data-action="send-order" ${state.cart.length ? "" : "disabled"}>Send order</button></div></div>
       </aside>
       <section class="panel span"><div class="panel-header"><div><h2>My active orders</h2><p>Close paid orders only after every required station marks its part done.</p></div></div><div class="panel-body"><div class="order-list">${
 				activeOrders()
@@ -871,7 +886,7 @@ function renderAdmin() {
       <div class="panel"><div class="panel-header"><div><h2>Menu management</h2><p>Add products, change prices, hide unavailable items.</p></div></div>
         <div class="panel-body cart-list">
           <div class="field"><label>Name</label><input class="input" data-action="product-name" value="${escapeHtml(state.productForm.name)}"></div>
-          <div class="field"><label>Category</label><input class="input" data-action="product-category" value="${escapeHtml(state.productForm.category)}"></div>
+          <div class="field"><label>Category</label><select class="select" data-action="product-category">${productCategories.map((category) => `<option value="${escapeHtml(category)}" ${state.productForm.category === category ? "selected" : ""}>${escapeHtml(category)}</option>`).join("")}</select></div>
           <div class="field-grid"><div class="field"><label>Price</label><input class="input" type="number" step="0.01" data-action="product-price" value="${escapeHtml(state.productForm.price)}"></div><div class="field"><label>Sort</label><input class="input" type="number" data-action="product-sort" value="${escapeHtml(state.productForm.sort)}"></div></div>
           <label class="check"><input type="checkbox" data-action="product-available" ${state.productForm.available ? "checked" : ""}> Available</label>
           <button class="primary" data-action="save-product">${state.productForm.id ? "Update product" : "Add product"}</button>
@@ -1014,6 +1029,7 @@ app.addEventListener("change", async (event) => {
 	}
 	if (action === "pay-method") state.payment.method = t.value;
 	if (action === "product-available") state.productForm.available = t.checked;
+	if (action === "product-category") state.productForm.category = t.value;
 	if (action === "waiter-active") state.waiterForm.active = t.checked;
 	if (action === "report-date") {
 		state.reportDate = t.value;

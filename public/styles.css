@@ -259,9 +259,9 @@ button:disabled {
 
 .product {
   display: grid;
-  gap: 6px;
-  min-height: 98px;
-  padding: 12px;
+  gap: 8px;
+  min-height: 112px;
+  padding: 14px;
   text-align: left;
   background: #f9fbfd;
   border: 1px solid var(--line);
@@ -273,16 +273,19 @@ button:disabled {
 }
 
 .product strong {
-  font-size: 14px;
+  font-size: 17px;
+  line-height: 1.25;
 }
 
 .product span {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
+  line-height: 1.25;
 }
 
 .price {
   color: var(--brand-dark);
+  font-size: 16px;
   font-weight: 800;
 }
 
